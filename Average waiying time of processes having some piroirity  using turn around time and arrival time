@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+void sortByPriority(int tasks[], int arrival[], int burst[], int priority[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (priority[i] > priority[j] || (priority[i] == priority[j] && arrival[i] > arrival[j])) {
+                // Swap priority
+                int temp = priority[i];
+                priority[i] = priority[j];
+                priority[j] = temp;
+
+                // Swap burst time
+                temp = burst[i];
+                burst[i] = burst[j];
+                burst[j] = temp;
+
+                // Swap arrival time
+                temp = arrival[i];
+                arrival[i] = arrival[j];
+                arrival[j] = temp;
+
+                // Swap task ID
+                temp = tasks[i];
+                tasks[i] = tasks[j];
+                tasks[j] = temp;
+            }
+        }
+    }
+}
+
+void calculateTimes(int arrival[], int burst[], int waiting[], int turnaround[], int completion[], int n) {
+    int time = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (time < arrival[i]) {
+            time = arrival[i]; // If CPU is idle, jump to next process arrival time
+        }
+        completion[i] = time + burst[i]; // Completion Time
+        turnaround[i] = completion[i] - arrival[i]; // Turnaround Time
+        waiting[i] = turnaround[i] - burst[i]; // Waiting Time
+        time = completion[i]; // Update current time
+    }
+}
+
+void displayResults(int tasks[], int arrival[], int burst[], int priority[], int waiting[], int turnaround[], int completion[], int n) {
+    float total_wait = 0, total_turnaround = 0;
+
+    printf("\nTask\tArrival\tBurst\tPriority\tWaiting\tTurnaround\tCompletion\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t\t%d\t%d\t\t%d\n", tasks[i], arrival[i], burst[i], priority[i], waiting[i], turnaround[i], completion[i]);
+        total_wait += waiting[i];
+        total_turnaround += turnaround[i];
+    }
+
+    printf("\nAverage Waiting Time: %.2f", total_wait / n);
+    printf("\nAverage Turnaround Time: %.2f\n", total_turnaround / n);
+}
+
+int main() {
+    int n;
+    printf("Enter number of tasks: ");
+    scanf("%d", &n);
+
+    int tasks[n], arrival[n], burst[n], priority[n], waiting[n], turnaround[n], completion[n];
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter arrival time, burst time, and priority for task %d: ", i + 1);
+        scanf("%d %d %d", &arrival[i], &burst[i], &priority[i]);
+        tasks[i] = i + 1;
+    }
+
+    sortByPriority(tasks, arrival, burst, priority, n);
+    calculateTimes(arrival, burst, waiting, turnaround, completion, n);
+    displayResults(tasks, arrival, burst, priority, waiting, turnaround, completion, n);
+
+    return 0;
+}
