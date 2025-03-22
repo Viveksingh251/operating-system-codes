@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+void sortByPriority(int tasks[], int burst[], int priority[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (priority[i] > priority[j]) {
+                // Swap priority
+                int temp = priority[i];
+                priority[i] = priority[j];
+                priority[j] = temp;
+
+                // Swap burst time
+                temp = burst[i];
+                burst[i] = burst[j];
+                burst[j] = temp;
+
+                // Swap task ID
+                temp = tasks[i];
+                tasks[i] = tasks[j];
+                tasks[j] = temp;
+            }
+        }
+    }
+}
+
+void calculateWaitingTime(int burst[], int waiting[], int n) {
+    waiting[0] = 0;
+    for (int i = 1; i < n; i++) {
+        waiting[i] = waiting[i - 1] + burst[i - 1];
+    }
+}
+
+void displayResults(int tasks[], int burst[], int priority[], int waiting[], int n) {
+    printf("\nTask\tBurst\tPriority\tWaiting\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t\t%d\n", tasks[i], burst[i], priority[i], waiting[i]);
+    }
+
+    float total_wait = 0;
+    for (int i = 0; i < n; i++) {
+        total_wait += waiting[i];
+    }
+    printf("\nAverage Waiting Time: %.2f\n", total_wait / n);
+}
+
+int main() {
+    int n;
+    printf("Enter number of tasks: ");
+    scanf("%d", &n);
+
+    int tasks[n], burst[n], priority[n], waiting[n];
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter burst time and priority for task %d: ", i + 1);
+        scanf("%d %d", &burst[i], &priority[i]);
+        tasks[i] = i + 1;
+    }
+
+    sortByPriority(tasks, burst, priority, n);
+    calculateWaitingTime(burst, waiting, n);
+    displayResults(tasks, burst, priority, waiting, n);
+
+    return 0;
+}
